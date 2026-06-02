@@ -1,0 +1,25 @@
+{
+  "name": "template",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "deploy": "bun run --filter web build && bun run --filter api deploy && bun run --filter web deploy",
+    "setup": "bun run --filter api setup:db && bun run --filter web setup && bun run db:setup",
+    "db:setup": "bun run --filter api db:setup",
+    "type-check": "turbo run type-check",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.9",
+    "turbo": "^2.8.21",
+    "typescript": "^5.9.0"
+  },
+  "packageManager": "bun@1.2.15",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

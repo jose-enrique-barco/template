@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "template-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "observability": {
+    "enabled": true
+  },
+  // The database. `binding` is the name the code uses (c.env.DB) — keep it "DB".
+  // For local dev wrangler creates a local copy automatically; `bun run setup`
+  // creates the remote DB and fills in the database_id below.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "template-db",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+    }
+  ]
+}

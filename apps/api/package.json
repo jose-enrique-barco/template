@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/dev.ts",
+    "deploy": "wrangler deploy",
+    "setup:db": "bun scripts/ensure-db.ts",
+    "db:setup": "wrangler d1 execute template-db --remote --file=../../packages/db/schema.sql",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@app/db": "workspace:*",
+    "@app/shared": "workspace:*",
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "@types/bun": "^1.2.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
+  }
+}
