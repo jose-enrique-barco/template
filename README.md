@@ -15,18 +15,24 @@ This is the part worth understanding. `apps/*` are the things you deploy;
 .
 ├── apps/
 │   ├── web/          ← the frontend people see (React + Vite + Tailwind)
-│   └── api/          ← the backend, the rules (Hono — Bun in dev, Workers in prod)
+│   └── api/          ← the backend, the rules (Hono on Cloudflare Workers)
 └── packages/
     ├── shared/       ← types both sides agree on
-    └── db/           ← the database: schema + queries (Cloudflare D1)
+    ├── db/           ← the database: schema + binding (Cloudflare D1, infra only)
+    └── counter/      ← an example feature: its endpoints + queries, as a module
 ```
 
 The project grows by **adding a package**, not by piling everything into one
-folder. Need login? Add `packages/oauth`. Need payments? `packages/payments`.
+folder. Each feature package exports a Hono **module** (a router); the `api` app
+is just an aggregator that mounts each one (see `apps/api/src/endpoints.ts`). The
+`db` package is pure infrastructure — it owns the schema and the binding shape,
+while the query logic for each feature lives in that feature's package. Need
+login? Add `packages/oauth`. Need payments? `packages/payments`.
 
 ## Run it
 
-You only need [Bun](https://bun.sh).
+You need [Bun](https://bun.sh) and Node.js v22+ (the backend runs through
+wrangler, which runs on Node).
 
 ```bash
 bun install
@@ -36,15 +42,16 @@ bun run dev          # start the frontend + backend together
 - Frontend → http://localhost:5173
 - Backend  → http://localhost:8787
 
-Open the frontend. It fetches a message from the backend (web → api → back), and
-the backend bumps a visit counter stored in the database and returns it — so the
-page shows the full round trip working: frontend → api → database → and back.
+Open the frontend. It lists counters from the backend (web → api → back), and you
+can create them, delete them, and bump each one up or down — every change is
+stored in the database. So the page shows the full round trip working: frontend →
+api → database → and back.
 
-> **How dev works:** the API runs on Bun directly (`bun --hot`), with a local
-> SQLite file (`apps/api/dev.db`) standing in for D1 — created and migrated
-> automatically on startup, no setup step. Run **one** `bun run dev` per machine
-> (the backend is pinned to port 8787). Production runs the same Hono code on
-> Cloudflare Workers with real D1.
+> **How dev works:** `bun run dev` runs the backend through `wrangler dev` — the
+> **same Cloudflare runtime (workerd) as production**, so there's no separate dev
+> code path. It uses a local D1 database in `.wrangler/` (not your remote one);
+> the schema is applied on each start, so the `counters` table is always there.
+> The backend is pinned to port 8787 — run **one** `bun run dev` per machine.
 
 ## Commands
 
@@ -59,8 +66,9 @@ page shows the full round trip working: frontend → api → database → and ba
 | `bun run db:setup`   | Re-apply the schema to your remote D1          |
 | `bun run deploy`     | Build + deploy the Worker and the Page         |
 
-> Note: wrangler runs on Node, so deploying needs Node.js v22+ (Bun's runtime has
-> an HTTP bug that hangs wrangler's API calls). Dev itself only needs Bun.
+> Note: both dev and deploy run wrangler, which runs on Node — so you need
+> Node.js v22+ (Bun's runtime has an HTTP bug that hangs wrangler). Bun is still
+> the package manager and runs the frontend build.
 
 ## Deploy to Cloudflare
 
@@ -114,9 +122,11 @@ Pages site (`…pages.dev`). Open the **bare** `…pages.dev` URL.
 
 ## Where to go next
 
-- Add a table in `packages/db/schema.sql` and a query function in `packages/db/src`
-  (then `bun run db:setup` to apply it to your remote database).
-- Add a route in `apps/api/src/routes/` and a matching type in `packages/shared`.
+- Add a table in `packages/db/schema.sql` (then `bun run db:setup` to apply it to
+  your remote database).
+- Add a feature package under `packages/` that exports a Hono module (queries +
+  endpoints, like `packages/counter`), add a matching type in `packages/shared`,
+  and mount it with one `app.route(...)` line in `apps/api/src/endpoints.ts`.
 - Add a page or component in `apps/web/src`.
 
 Ship it ugly. Improve it later.

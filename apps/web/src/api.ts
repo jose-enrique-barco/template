@@ -1,4 +1,4 @@
-import type { Greeting } from "@app/shared";
+import type { Counter } from "@app/shared";
 
 // Where the API lives. In dev this is empty, so requests stay relative ("/api/…")
 // and Vite proxies them to the Worker. In production there's no proxy, so the
@@ -20,8 +20,32 @@ async function request(path: string, init?: RequestInit): Promise<Response> {
   }
 }
 
-export async function fetchGreeting(): Promise<Greeting> {
-  const res = await request("/api/hello");
+export async function listCounters(): Promise<Counter[]> {
+  const res = await request("/api/counters");
   if (!res.ok) throw new Error("failed to reach the api");
+  return res.json();
+}
+
+export async function createCounter(name: string): Promise<Counter> {
+  const res = await request("/api/counters", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error("failed to create counter");
+  return res.json();
+}
+
+export async function deleteCounter(id: number): Promise<void> {
+  const res = await request(`/api/counters/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("failed to delete counter");
+}
+
+export async function adjustCounter(
+  id: number,
+  direction: "increment" | "decrement",
+): Promise<Counter> {
+  const res = await request(`/api/counters/${id}/${direction}`, { method: "POST" });
+  if (!res.ok) throw new Error("failed to update counter");
   return res.json();
 }

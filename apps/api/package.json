@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --hot src/dev.ts",
+    "dev": "wrangler d1 execute template-db --local --file=../../packages/db/schema.sql && wrangler dev --port 8787",
     "deploy": "wrangler deploy",
     "setup:db": "bun scripts/ensure-db.ts",
     "db:setup": "wrangler d1 execute template-db --remote --file=../../packages/db/schema.sql",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@app/counter": "workspace:*",
     "@app/db": "workspace:*",
     "@app/shared": "workspace:*",
     "hono": "^4.6.0"

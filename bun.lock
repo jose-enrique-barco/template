@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "photo-store",
@@ -12,6 +13,7 @@
     "apps/api": {
       "name": "api",
       "dependencies": {
+        "@app/counter": "workspace:*",
         "@app/db": "workspace:*",
         "@app/shared": "workspace:*",
         "hono": "^4.6.0",
@@ -41,6 +43,19 @@
         "wrangler": "^4.0.0",
       },
     },
+    "packages/counter": {
+      "name": "@app/counter",
+      "version": "0.0.0",
+      "dependencies": {
+        "@app/db": "workspace:*",
+        "@app/shared": "workspace:*",
+        "hono": "^4.6.0",
+      },
+      "devDependencies": {
+        "@cloudflare/workers-types": "^4.20241127.0",
+        "typescript": "^5.9.0",
+      },
+    },
     "packages/db": {
       "name": "@app/db",
       "version": "0.0.0",
@@ -58,6 +73,8 @@
     },
   },
   "packages": {
+    "@app/counter": ["@app/counter@workspace:packages/counter"],
+
     "@app/db": ["@app/db@workspace:packages/db"],
 
     "@app/shared": ["@app/shared@workspace:packages/shared"],
