@@ -8,12 +8,15 @@
   },
   // The database. `binding` is the name the code uses (c.env.DB) — keep it "DB".
   // For local dev wrangler creates a local copy automatically; `bun run setup`
-  // creates the remote DB and fills in the database_id below.
+  // creates the remote DB and fills in the database_id below. `migrations_dir`
+  // points at the versioned SQL that drizzle-kit generates in @app/db, so
+  // `wrangler d1 migrations apply` knows what to run.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "template-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "../../packages/db/migrations"
     }
   ]
 }
