@@ -6,6 +6,10 @@ database — so you start from a working app, not a blank page.
 
 Runs on Cloudflare's free tier.
 
+Built for a workshop I gave at a coliving with EIT Digital master's colleagues,
+on starting a side project without overthinking it. This is the boilerplate
+behind that talk.
+
 ## The structure
 
 This is the part worth understanding. `apps/*` are the things you deploy;
